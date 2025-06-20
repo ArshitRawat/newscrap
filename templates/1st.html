@@ -3,45 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RGPV Result Scraper</title>
+    <title>🎓 RGPV Result Scraper</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
-        form { background: #f5f5f5; padding: 20px; border-radius: 8px; }
-        label { display: block; margin: 10px 0 5px; font-weight: bold; }
-        input { width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
-        input[type="submit"] { background: #007bff; color: white; cursor: pointer; font-size: 16px; }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f8f9fa; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; margin-bottom: 30px; }
+        form { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; color: #555; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        input[type="submit"] { background: #007bff; color: white; cursor: pointer; font-size: 16px; font-weight: bold; }
         input[type="submit"]:hover { background: #0056b3; }
+        input[type="submit"]:disabled { background: #ccc; cursor: not-allowed; }
+        .status { padding: 15px; margin: 20px 0; border-radius: 5px; display: none; }
+        .status.success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .status.error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .status.info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        .instructions { margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 5px; }
+        .results-section { margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; }
+        .file-item { padding: 10px; margin: 5px 0; background: white; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .download-btn { background: #28a745; color: white; padding: 5px 15px; text-decoration: none; border-radius: 4px; font-size: 12px; }
+        .download-btn:hover { background: #218838; }
+        .loading { display: none; text-align: center; margin: 20px 0; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <h1>🎓 RGPV Result Scraper</h1>
-    <form action="/submit" method="post">
-        <label for="branch">Branch (CS, IT, ME, AI, DS, EC, EX):</label>
-        <input type="text" id="branch" name="branch" required pattern="CS|IT|ME|AI|DS|EC|EX" title="Enter valid branch code">
+    <div class="container">
+        <h1>🎓 RGPV Result Scraper</h1>
         
-        <label for="year">Year of Admission (e.g., 24 for 2024):</label>
-        <input type="text" id="year" name="year" required pattern="[0-9]{2}" title="Enter 2-digit year">
+        <form id="scrapingForm">
+            <label for="branch">Branch:</label>
+            <select id="branch" name="branch" required>
+                <option value="">Select Branch</option>
+                <option value="CS">Computer Science (CS)</option>
+                <option value="IT">Information Technology (IT)</option>
+                <option value="ME">Mechanical Engineering (ME)</option>
+                <option value="AI">Artificial Intelligence (AI)</option>
+                <option value="DS">Data Science (DS)</option>
+                <option value="EC">Electronics & Communication (EC)</option>
+                <option value="EX">Electronics (EX)</option>
+            </select>
+            
+            <label for="year">Year of Admission (e.g., 24 for 2024):</label>
+            <input type="text" id="year" name="year" required pattern="[0-9]{2}" title="Enter 2-digit year" placeholder="24">
+            
+            <label for="sem">Semester:</label>
+            <select id="sem" name="sem" required>
+                <option value="">Select Semester</option>
+                <option value="1">1st Semester</option>
+                <option value="2">2nd Semester</option>
+                <option value="3">3rd Semester</option>
+                <option value="4">4th Semester</option>
+                <option value="5">5th Semester</option>
+                <option value="6">6th Semester</option>
+                <option value="7">7th Semester</option>
+                <option value="8">8th Semester</option>
+            </select>
+            
+            <label for="start">Starting Roll Number:</label>
+            <input type="number" id="start" name="start" min="1" max="999" required placeholder="1">
+            
+            <label for="end">Ending Roll Number:</label>
+            <input type="number" id="end" name="end" min="1" max="999" required placeholder="100">
+            
+            <input type="submit" id="submitBtn" value="🚀 Start Scraping">
+        </form>
+
+        <div id="status" class="status"></div>
         
-        <label for="sem">Semester (1-8):</label>
-        <input type="number" id="sem" name="sem" min="1" max="8" required>
-        
-        <label for="start">Starting Roll Number:</label>
-        <input type="number" id="start" name="start" min="1" required>
-        
-        <label for="end">Ending Roll Number:</label>
-        <input type="number" id="end" name="end" min="1" required>
-        
-        <input type="submit" value="🚀 Start Scraping">
-    </form>
-    
-    <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 5px;">
-        <h3>📝 Instructions:</h3>
-        <ul>
-            <li>Enter valid branch codes: CS, IT, ME, AI, DS, EC, EX</li>
-            <li>Year should be 2 digits (e.g., 24 for 2024)</li>
-            <li>The process may take several minutes depending on the range</li>
-            <li>Results will be saved as CSV files on the server</li>
-        </ul>
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Scraping in progress... Please wait.</p>
+        </div>
+
+        <div class="instructions">
+            <h3>📝 Instructions:</h3>
+            <ul>
+                <li>Select branch from dropdown menu</li>
+                <li>Year should be 2 digits (e.g., 24 for 2024)</li>
+                <li>The process may take several minutes depending on the range</li>
+                <li>Results will be saved as CSV and Excel files</li>
+                <li>You can download the files from the Results section below</li>
+                <li><strong>Note:</strong> Large ranges may take significant time due to captcha solving</li>
+            </ul>
+        </div>
+
+        <div class="results-section">
+            <h3>📊 Downloaded Results</h3>
+            <button onclick="loadResults()">🔄 Refresh Results</button>
+            <div id="resultsList"></div>
+        </div>
     </div>
+
+    <script>
+        let statusInterval;
+
+        document.getElementById('scrapingForm').onsubmit = function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = document.getElementById('submitBtn');
+            const statusDiv = document.getElementById('status');
+            const loadingDiv = document.getElementById('loading');
+
+            submitBtn.disabled = true;
+            loadingDiv.style.display = 'block';
+            statusDiv.style.display = 'none';
+
+            fetch('/submit', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showStatus(data.error, 'error');
+                    submitBtn.disabled = false;
+                    loadingDiv.style.display = 'none';
+                } else {
+                    showStatus('Scraping started! Please wait...', 'success');
+                    startStatusPolling();
+                }
+            })
+            .catch(error => {
+                showStatus('Error: ' + error.message, 'error');
+                submitBtn.disabled = false;
+                loadingDiv.style.display = 'none';
+            });
+        };
+
+        function startStatusPolling() {
+            statusInterval = setInterval(() => {
+                fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.running) {
+                        showStatus('Status: ' + data.progress, 'info');
+                    } else {
+                        clearInterval(statusInterval);
+                        document.getElementById('submitBtn').disabled = false;
+                        document.getElementById('loading').style.display = 'none';
+                        
+                        if (data.error) {
+                            showStatus('Error: ' + data.error, 'error');
+                        } else {
+                            showStatus('✅ Scraping completed! ' + data.progress, 'success');
+                            loadResults();
+                        }
+                    }
+                })
+                .catch(error => {
+                    clearInterval(statusInterval);
+                    showStatus('Status check failed: ' + error.message, 'error');
+                });
+            }, 2000);
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+            statusDiv.style.display = 'block';
+        }
+
+        function loadResults() {
+            fetch('/results')
+            .then(response => response.json())
+            .then(files => {
+                const resultsList = document.getElementById('resultsList');
+                if (files.length === 0) {
+                    resultsList.innerHTML = '<p>No result files found.</p>';
+                } else {
+                    resultsList.innerHTML = files.map(file => `
+                        <div class="file-item">
+                            <div>
+                                <strong>${file.name}</strong><br>
+                                <small>Size: ${(file.size/1024).toFixed(1)} KB | Modified: ${file.modified}</small>
+                            </div>
+                            <a href="/download/${file.name}" class="download-btn">📥 Download</a>
+                        </div>
+                    `).join('');
+                }
+            })
+            .catch(error => {
+                document.getElementById('resultsList').innerHTML = '<p>Error loading results: ' + error.message + '</p>';
+            });
+        }
+
+        // Load results on page load
+        loadResults();
+    </script>
 </body>
 </html>
