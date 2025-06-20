@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RGPV Result Scraper</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        form { background: #f5f5f5; padding: 20px; border-radius: 8px; }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        input[type="submit"] { background: #007bff; color: white; cursor: pointer; font-size: 16px; }
+        input[type="submit"]:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🎓 RGPV Result Scraper</h1>
+    <form action="/submit" method="post">
+        <label for="branch">Branch (CS, IT, ME, AI, DS, EC, EX):</label>
+        <input type="text" id="branch" name="branch" required pattern="CS|IT|ME|AI|DS|EC|EX" title="Enter valid branch code">
+        
+        <label for="year">Year of Admission (e.g., 24 for 2024):</label>
+        <input type="text" id="year" name="year" required pattern="[0-9]{2}" title="Enter 2-digit year">
+        
+        <label for="sem">Semester (1-8):</label>
+        <input type="number" id="sem" name="sem" min="1" max="8" required>
+        
+        <label for="start">Starting Roll Number:</label>
+        <input type="number" id="start" name="start" min="1" required>
+        
+        <label for="end">Ending Roll Number:</label>
+        <input type="number" id="end" name="end" min="1" required>
+        
+        <input type="submit" value="🚀 Start Scraping">
+    </form>
+    
+    <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 5px;">
+        <h3>📝 Instructions:</h3>
+        <ul>
+            <li>Enter valid branch codes: CS, IT, ME, AI, DS, EC, EX</li>
+            <li>Year should be 2 digits (e.g., 24 for 2024)</li>
+            <li>The process may take several minutes depending on the range</li>
+            <li>Results will be saved as CSV files on the server</li>
+        </ul>
+    </div>
+</body>
+</html>
